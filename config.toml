@@ -22,3 +22,9 @@ highlight_code = true
 [extra]
 # Put all your custom variables here
 author = "tmn"
+
+after_dark_menu = [
+    {url = "$BASE_URL", name = "Home"},
+    {url = "$BASE_URL/tags", name = "Tags"},
+    {url = "https://github.com/timonviola/", name = "GitHub"},
+]
