@@ -1,5 +1,9 @@
 +++
-paginate_by = 5
+template = 'home.html'
+
+[extra]
+lang = 'en'
 +++
 
-My devlog
+
+This is my devlog.
