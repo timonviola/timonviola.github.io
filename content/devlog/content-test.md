@@ -42,3 +42,4 @@ for i in code:
     time.sleep(1)
 sys.exit(0)
 ```
+o
