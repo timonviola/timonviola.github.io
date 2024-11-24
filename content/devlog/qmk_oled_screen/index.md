@@ -12,7 +12,7 @@ categories = ["General"]
 lang = "en"
 toc = true
 +++
-You need only a few steps to create a custom logo for your OLED screen. I have a `0.91 OLED LCD Display 128x32 SSD1306 I2C`, but you can follow this guide for other resolutions/sizes as well.
+If you are using [QMK firmware](https://github.com/qmk/qmk_firmware), you need only a few steps to create a custom logo for your OLED screen. I have a `0.91 OLED LCD Display 128x32 SSD1306 I2C`, but you can follow this guide for other resolutions/sizes as well.
 
 1. Create your art:
   - size should be 128 × 32 pixels
