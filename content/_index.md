@@ -6,4 +6,4 @@ lang = 'en'
 +++
 
 
-This is my devlog.
+This is my devlog 📃.
