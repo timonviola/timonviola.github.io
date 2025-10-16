@@ -1,8 +1,8 @@
 +++
-title = "Debugging ssh"
+title = "ssh: know_hosts"
 date = 2025-02-27
 description = "Some notes on debugging ssh connection."
-draft = true
+draft = false
 
 [taxonomies]
 tags = []
@@ -14,16 +14,17 @@ toc = true
 +++
 
 # Where do we start from?
-So I never really thought about, how to *debug* `ssh`. It was always just working and if not, I could just quickly generate a new key-pair.
+SSH has been around for quite a while - 30 years. It is one of those tools, which I rely on everyday, and never really looked into it after it was _working_. No I did not read the whole [RFC](https://www.openssh.com/txt/rfc4253.txt), but I picked one small part of it: `known_hosts`.
+
+_(The RFC doesn't mention known hosts.)_
 
 I also thought that ssh needs 2 files (keys):
 - public (id_ed25519) and
 - private key-pair (id_ed25519.pub)
 
-And maybe a +1 (I have a pretty neat "config" file, with useful aliases, key-chain configuration etc.).
+And you can have a `+1` config file (with useful aliases, key-chain configuration etc.).
 
-However, there is a `known_hosts` file, which is pretty important.
-Here is the contents of `known_hosts`:
+However, there is a `known_hosts` file, which is pretty important. From `man ssh`:
 ```
 ssh  automatically  maintains  and  checks  a database containing
 identification for all hosts it has ever been  used  with.   Host
@@ -38,20 +39,6 @@ StrictHostKeyChecking option can be used to control logins to ma‐
 chines whose host key is not known or has changed.
 ```
 
-Yeah, this was the part where you just type in `y` . Quite an important piece of the protocol!
-
-Here is a quick representation for the visualcortex:
-
-
-# Useful commands
-## ping the host (server)
-ssh -Tv github.com -> just ping the server
-
-## force ssh to use specific key:
-ssh -o "IdentitiesOnly=yes" -i $HOME/.ssh/id_ed25519_gh git@github.com
-
-## get the host public key
-ssh-keyscan github.com > ./known_hosts
-
+Yeah, this was the part where you just type in `y` . (hopefully, you pressed `y`)
 
 
