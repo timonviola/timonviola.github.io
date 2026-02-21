@@ -40,7 +40,7 @@ anchors = "on"
 [extra]
 name = "tmon"
 id = "timonviola"
-bio = "I post content on software/keyboard engineering."
+bio = "I write here things. Sometimes."
 avatar = "img/avatar.webp"
 links = [
   { name = "GitHub", icon = "github", url = "https://github.com/timonviola" },
@@ -54,6 +54,7 @@ recent_more_text = "more »"
 
 sections = [
     { name = "💾 devlog", path = "/devlog", is_external = false },
+    { name = "🏷️ tags", path = "/tags", is_external = false },
     # { name = "about", path = "/about", is_external = false },
     # { name = "github", path = "https://github.com/<your-username>", is_external = true },
 ]
