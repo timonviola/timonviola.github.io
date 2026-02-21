@@ -34,6 +34,7 @@
         devShell = pkgs.mkShell {
           packages = [
             zola
+            pkgs.typos
           ];
         };
       }
