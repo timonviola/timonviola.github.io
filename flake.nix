@@ -31,6 +31,12 @@
           installPhase = "cp -r public $out";
         };
         defaultPackage = self.packages.${system}.website;
+        apps.default = {
+          type = "app";
+          program = "${pkgs.writeShellScript "zola-serve" ''
+            exec ${zola}/bin/zola serve "$@"
+          ''}";
+        };
         devShell = pkgs.mkShell {
           packages = [
             zola
