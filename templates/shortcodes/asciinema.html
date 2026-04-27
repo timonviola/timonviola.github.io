@@ -1,0 +1,14 @@
+<div id="cast-{{ nth }}"></div>
+<script src="/asciinema-player.min.js"></script>
+<script>
+(function() {
+  var castUrl = new URL('{{ src }}', window.location.href).href;
+  AsciinemaPlayer.create(castUrl, document.getElementById('cast-{{ nth }}'), {
+    autoPlay: {{ autoPlay | default(value=false) }},
+    loop: {{ loop | default(value=false) }},
+    controls: {{ controls | default(value=true) }},
+    fit: 'width',
+    useTerminalTheme: false,
+  });
+})();
+</script>
