@@ -1,0 +1,141 @@
+/* Site header, ported from serene v4 to work with the serene v5 layout */
+
+body {
+  --header-height: 45px;
+  --icon-size: 20px;
+}
+
+body:has(header#site-header) {
+  padding-top: var(--header-height);
+}
+
+html {
+  scroll-padding-top: calc(45px + 15px);
+}
+
+header#site-header {
+  /* reset the serene v5 in-page `header` styles */
+  font-size: 1em;
+  padding: 0;
+
+  a {
+    display: inline;
+    margin: 0;
+    padding: 0;
+  }
+
+  z-index: 99;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: var(--header-height);
+  background-color: var(--bg-color);
+  border-bottom: 1.5px solid var(--primary-color);
+
+  @supports (-webkit-backdrop-filter: none) or (backdrop-filter: none) {
+    &.blur {
+      background-color: initial;
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+    }
+  }
+
+  #header-wrapper {
+    height: 100%;
+    max-width: var(--main-max-width);
+    margin: 0 auto;
+    padding: 0 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+  }
+
+  nav {
+    font-size: 1.35em;
+    display: flex;
+    align-items: center;
+
+    a {
+      color: var(--text-color);
+      text-decoration: none;
+
+      &:hover {
+        color: var(--primary-color);
+      }
+    }
+
+    .separator {
+      width: 24px;
+      text-align: center;
+      line-height: 1;
+      cursor: pointer;
+      border: none;
+      padding: 0;
+      background: transparent;
+      margin: 0 0.1em;
+      color: var(--text-color);
+      font-family: inherit;
+      font-size: inherit;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .wrap {
+      &.left {
+        margin: 0 0.3em 0 -0.1em;
+      }
+
+      &.right {
+        margin: 0 0 0 0.3em;
+      }
+    }
+
+    .wrap-separator {
+      margin: 0 0.5em 0 0.1em;
+    }
+
+    .fold {
+      display: none;
+
+      &.shown {
+        display: initial;
+      }
+    }
+  }
+
+  #btns {
+    display: flex;
+    gap: 1em;
+    align-items: center;
+    padding-top: 1.5px;
+
+    a,
+    button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: var(--icon-size);
+      height: var(--icon-size);
+      border: none;
+      background-color: transparent;
+      padding: 0;
+      text-decoration: none;
+      color: var(--text-color);
+      cursor: pointer;
+
+      @media (hover: hover) {
+        &:hover {
+          color: var(--primary-color);
+        }
+      }
+    }
+  }
+}
+
+body:has(header#site-header).post aside {
+  top: var(--header-height);
+
+  nav {
+    max-height: calc(100vh - 6em - var(--header-height));
+  }
+}
