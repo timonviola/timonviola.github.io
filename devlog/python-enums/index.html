@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  
+    
+  <meta name="description" content="Some thoughts on Enums vs Literals in Python 3.11+">
+<link rel="canonical" href="https://tmon.xyz/devlog/python-enums/">
+<meta property="og:site_name" content="another devlog">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python Enums and Literals">
+<meta property="og:description" content="Some thoughts on Enums vs Literals in Python 3.11+">
+<meta property="og:url" content="https://tmon.xyz/devlog/python-enums/">
+<meta property="og:locale" content="en">
+
+
+<meta property="article:published_time" content="2026-02-01">
+
+<meta property="article:tag" content="python">
+
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Python Enums and Literals">
+<meta name="twitter:description" content="Some thoughts on Enums vs Literals in Python 3.11+">
+
+
+
+  <title>Python Enums and Literals</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="https://tmon.xyz/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://tmon.xyz/img/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://tmon.xyz/img/apple-touch-icon.png">
+  
+  <style>
+
+  /* light mode colors */
+  body {
+    --primary-color: #5871a2;
+    --primary-pale-color: #5871a210;
+    --text-color: #3C4043;
+    --text-pale-color: #94969f;
+    --bg-color: #ffffff; 
+    --highlight-mark-color: #5f75b035;
+  
+    --callout-note-color: #5871a2;
+    --callout-important-color: #8062b0;
+    --callout-warning-color: #936e51;
+    --callout-alert-color: #bc5252;
+    --callout-question-color: #477389;
+    --callout-tip-color: #3c8460;
+  }
+
+  /* dark mode colors */
+  body.dark {
+    --primary-color: #81a2a9;
+    --primary-pale-color: #5d77ac20;
+    --text-color: #c9ba9e;
+    --text-pale-color: #747983;
+    --bg-color: #192030;
+    --highlight-mark-color: #5f75b035;
+
+    --callout-note-color: #5d77ac;
+    --callout-important-color: #8062b0;
+    --callout-warning-color: #936e51;
+    --callout-alert-color: #bc5252;
+    --callout-question-color: #477389;
+    --callout-tip-color: #3c8460;
+  }
+
+  /* typography */
+  body {
+    --main-font: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --code-font: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    --homepage-max-width: 768px;
+    --main-max-width: 768px;
+    --avatar-size: 60px;
+    --icon-size: 20px;
+    --homepage-font-size: 16px;
+    --homepage-line-height: 1.75;
+    --paragraph-font-size: 16px;
+    --paragraph-line-height: 1.75;
+    --aside-font-size: 15px;
+    --img-border-radius: 0px;
+    --callout-border-radius: 0px;
+    --detail-border-radius: 0px;
+    --dark-mode-img-brightness: 0.75;
+    --dark-mode-chart-brightness: 0.75;
+    --inline-code-border-radius: 2px;
+    --inline-code-bg-color: var(--primary-pale-color);
+    --block-code-border-radius: 0px;
+    --block-code-border-color: var(--primary-color);
+    --detail-border-color: var(--primary-color);
+  }
+
+</style>
+
+  <link rel="stylesheet" href="https://tmon.xyz/main.css">
+  <link rel="stylesheet" href="https://tmon.xyz/header.css">
+  
+
+<link id="hl" rel="stylesheet" type="text/css" href="/giallo-light.css" />
+
+
+
+  <link rel="stylesheet" href="/asciinema-player.css">
+
+</head>
+
+<body class="post">
+  
+  <script>
+    const theme = sessionStorage.getItem('theme');
+    const match = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    if ((theme && theme == 'dark') || (!theme && match)) {
+      document.body.classList.add('dark');
+      const hl = document.querySelector('link#hl');
+      if (hl) hl.href = 'https://tmon.xyz/giallo-dark.css';
+    }
+  </script>
+  
+  
+  <header id="site-header" class="blur">
+  <div id="header-wrapper">
+    <nav>
+      <a class="instant" href="https://tmon.xyz">timonviola</a>
+      
+        <button id="toggler" class="separator" aria-label="toggle expand">::</button>
+        <span class="wrap left fold">{</span>
+        
+        
+          
+        
+          
+        
+        
+        
+          
+          
+          <a class="instant " href="https://tmon.xyz/devlog">💾 devlog</a>
+          <span class="wrap-separator fold">,</span>
+        
+          
+          
+            
+          
+          <a class="instant fold" href="https://tmon.xyz/tags">🏷️ tags</a>
+          
+        
+        <span class="wrap right fold">} ;</span>
+      
+    </nav>
+    <div id="btns">
+      
+      
+      
+      <button id="theme-toggle" aria-label="theme switch">
+        <span class="moon-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"><path d="M10 7C10 10.866 13.134 14 17 14C18.9584 14 20.729 13.1957 21.9995 11.8995C22 11.933 22 11.9665 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C12.0335 2 12.067 2 12.1005 2.00049C10.8043 3.27098 10 5.04157 10 7ZM4 12C4 16.4183 7.58172 20 12 20C15.0583 20 17.7158 18.2839 19.062 15.7621C18.3945 15.9187 17.7035 16 17 16C12.0294 16 8 11.9706 8 7C8 6.29648 8.08133 5.60547 8.2379 4.938C5.71611 6.28423 4 8.9417 4 12Z" fill="currentColor"></path></svg></span>
+        <span class="sun-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"><path d="M12 18C8.68629 18 6 15.3137 6 12C6 8.68629 8.68629 6 12 6C15.3137 6 18 8.68629 18 12C18 15.3137 15.3137 18 12 18ZM12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16ZM11 1H13V4H11V1ZM11 20H13V23H11V20ZM3.51472 4.92893L4.92893 3.51472L7.05025 5.63604L5.63604 7.05025L3.51472 4.92893ZM16.9497 18.364L18.364 16.9497L20.4853 19.0711L19.0711 20.4853L16.9497 18.364ZM19.0711 3.51472L20.4853 4.92893L18.364 7.05025L16.9497 5.63604L19.0711 3.51472ZM5.63604 16.9497L7.05025 18.364L4.92893 20.4853L3.51472 19.0711L5.63604 16.9497ZM23 11V13H20V11H23ZM4 11V13H1V11H4Z" fill="currentColor"></path></svg></span>
+      </button>
+      
+    </div>
+  </div>
+</header>
+
+  
+  
+<div id="wrapper">
+  <div id="blank"></div>
+  <aside>
+    
+    
+    <nav>
+      <ul>
+        
+        <li>
+          <a class="h2" href="#why-not-to-use-enums-then">Why not to use Enums then?</a>
+          
+        </li>
+        
+        <li>
+          <a class="h2" href="#the-annoying-things">The annoying things</a>
+          
+        </li>
+        
+        <li>
+          <a class="h2" href="#conclusion">Conclusion</a>
+          
+        </li>
+        
+        <li>
+          <a class="h2" href="#references">References</a>
+          
+        </li>
+        
+      </ul>
+    </nav>
+    
+    
+    <button id="back-to-top" aria-label="back to top">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path d="M11.9997 10.8284L7.04996 15.7782L5.63574 14.364L11.9997 8L18.3637 14.364L16.9495 15.7782L11.9997 10.8284Z" fill="currentColor"></path></svg>
+    </button>
+    
+  </aside>
+  <main>
+    
+<header>
+  <nav>
+    <a id="back-link" href="https:&#x2F;&#x2F;tmon.xyz&#x2F;devlog">← Back</a>
+  </nav>
+</header>
+
+
+    <div>
+      
+      
+      
+      
+      <div id="copy-cfg" style="display: none;" data-copy-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;20&quot; height=&quot;20&quot;&gt;&lt;path d=&quot;M6.9998 6V3C6.9998 2.44772 7.44752 2 7.9998 2H19.9998C20.5521 2 20.9998 2.44772 20.9998 3V17C20.9998 17.5523 20.5521 18 19.9998 18H16.9998V20.9991C16.9998 21.5519 16.5499 22 15.993 22H4.00666C3.45059 22 3 21.5554 3 20.9991L3.0026 7.00087C3.0027 6.44811 3.45264 6 4.00942 6H6.9998ZM5.00242 8L5.00019 20H14.9998V8H5.00242ZM8.9998 6H16.9998V16H18.9998V4H8.9998V6Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;" data-check-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;20&quot; height=&quot;20&quot;&gt;&lt;path d=&quot;M10.0007 15.1709L19.1931 5.97852L20.6073 7.39273L10.0007 17.9993L3.63672 11.6354L5.05093 10.2212L10.0007 15.1709Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;"></div>
+      
+      <article class="prose">
+        <h1>Python Enums and Literals</h1>
+        <div id="post-info">
+          <div id="date">
+            <span id="publish">2026-02-01</span>
+            </div>
+
+          
+          <div id="tags">
+            <a class="instant" href="https://tmon.xyz/tags/python"><span>#</span>python</a>
+          </div>
+          
+        </div>
+
+        
+        
+
+        
+
+        <p>C, Rust, TypeScript and almost all programming languages offer 'enums' as a way of expressing, that a variable can have a certain set of values. Python is no exception, <a rel="nofollow noreferrer external" href="https://docs.python.org/3/library/enum.html">Enums</a> are supposed to fulfill the same purpose, but many times it is more practical to rely on <a rel="nofollow noreferrer external" href="https://docs.python.org/3/library/typing.html#typing.Literal">Literals</a>. At this point I am starting to think that Python's enums are the <a rel="nofollow noreferrer external" href="https://www.britannica.com/story/why-does-cilantro-taste-like-soap-to-some-people">coriander</a> of Python.</p>
+<p>The type checker set-up:</p>
+<ul>
+<li>python 3.11+</li>
+<li>mypy with <code>strict</code> mode</li>
+<li>basedpyright with <code>strict</code> mode</li>
+</ul>
+<p>Let's take a look at a use-case, where <code>StrEnum</code> and <code>Literal</code> can be directly compared:</p>
+<pre class="giallo z-code"><code data-lang="python"><span class="giallo-l"><span class="z-keyword">from</span><span> enum</span><span class="z-keyword"> import</span><span> StrEnum</span><span>,</span><span> auto</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-storage z-type">class</span><span class="z-entity z-name"> Environment</span><span>(</span><span class="z-entity">StrEnum</span><span>)</span><span>:</span></span>
+<span class="giallo-l"><span class="z-constant">    STAGING</span><span class="z-keyword"> =</span><span> auto</span><span>(</span><span>)</span></span>
+<span class="giallo-l"><span class="z-constant">    PRODUCTION</span><span class="z-keyword"> =</span><span> auto</span><span>(</span><span>)</span></span>
+<span class="giallo-l"></span></code></pre><pre class="giallo z-code"><code data-lang="python"><span class="giallo-l"><span class="z-keyword">from</span><span> typing</span><span class="z-keyword"> import</span><span> Literal</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>EnvironmentProduction</span><span class="z-keyword"> =</span><span> Literal</span><span>[</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-string">PRODUCTION</span><span class="z-punctuation z-definition z-string">&quot;</span><span>]</span></span>
+<span class="giallo-l"><span>EnvironmentStaging</span><span class="z-keyword"> =</span><span> Literal</span><span>[</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-string">STAGING</span><span class="z-punctuation z-definition z-string">&quot;</span><span>]</span></span>
+<span class="giallo-l"><span>Environment</span><span class="z-keyword"> =</span><span> EnvironmentStaging</span><span class="z-keyword"> |</span><span> EnvironmentProduction</span></span></code></pre>
+<p>Enums have the advantage of</p>
+<ul>
+<li>runtime safety</li>
+<li>maintainability.</li>
+</ul>
+<p>Parsing user input, API responses with an Enum, gives you a runtime error. With Literals, it will be just another string at runtime, and you may not notice the error until much later. Using static type checkers, as above, does help you mitigate this, but it is not the same as runtime safety.</p>
+<p>Enums also help to avoid polluting the code with string literals. This helps avoid typos and makes refactoring easier (i.e. renaming). With Literals, you have to use <code>== "production"</code> and so on and perform a global search and replace, which is error-prone. I guess with LLMs and agentic coding, this is less of an issue, but still...</p>
+<p>Another plus on maintainability is that, Enums do not let you inherit, but Literals do.</p>
+<p>Alright, so looking at literals, I have to repeat the strings:</p>
+<pre class="giallo z-code"><code data-lang="python"><span class="giallo-l"><span class="z-storage z-type">def</span><span class="z-entity z-name"> literal_function</span><span>(</span><span class="z-variable z-parameter z-function">this</span><span>:</span><span> Environment</span><span>)</span><span>:</span></span>
+<span class="giallo-l"><span class="z-keyword">    match</span><span> this</span><span>:</span></span>
+<span class="giallo-l"><span class="z-keyword">        case</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">PRODUCTION</span><span class="z-punctuation z-definition z-string">&quot;</span><span>:</span></span>
+<span class="giallo-l"><span class="z-support">            print</span><span>(</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-string">a</span><span class="z-punctuation z-definition z-string">&quot;</span><span>)</span></span>
+<span class="giallo-l"><span class="z-keyword">        case</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">STAGING</span><span class="z-punctuation z-definition z-string">&quot;</span><span>:</span></span>
+<span class="giallo-l"><span class="z-support">            print</span><span>(</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-string">b</span><span class="z-punctuation z-definition z-string">&quot;</span><span>)</span></span>
+<span class="giallo-l"><span class="z-keyword">        case</span><span> _</span><span>:</span></span>
+<span class="giallo-l"><span class="z-support">            print</span><span>(</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-string">something else</span><span class="z-punctuation z-definition z-string">&quot;</span><span>)</span></span></code></pre>
+<p>But with Enums, I can simply refer to the enum members:</p>
+<pre class="giallo z-code"><code data-lang="python"><span class="giallo-l"><span class="z-storage z-type">def</span><span class="z-entity z-name"> enum_function</span><span>(</span><span class="z-variable z-parameter z-function">this</span><span>:</span><span> EnumEnvironment</span><span>)</span><span>:</span></span>
+<span class="giallo-l"><span class="z-keyword">    match</span><span> this</span><span>:</span></span>
+<span class="giallo-l"><span class="z-keyword">        case</span><span> EnumEnvironment</span><span>.</span><span class="z-constant">PRODUCTION</span><span>:</span></span>
+<span class="giallo-l"><span class="z-support">            print</span><span>(</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-string">a</span><span class="z-punctuation z-definition z-string">&quot;</span><span>)</span></span>
+<span class="giallo-l"><span class="z-keyword">        case</span><span> EnumEnvironment</span><span>.</span><span class="z-constant">STAGING</span><span>:</span></span>
+<span class="giallo-l"><span class="z-support">            print</span><span>(</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-string">b</span><span class="z-punctuation z-definition z-string">&quot;</span><span>)</span></span>
+<span class="giallo-l"><span class="z-keyword">        case</span><span> _</span><span>:</span></span>
+<span class="giallo-l"><span class="z-support">            print</span><span>(</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-string">panic!</span><span class="z-punctuation z-definition z-string">&quot;</span><span>)</span></span></code></pre>
+<p>I get</p>
+<ul>
+<li>proper LSP completion (not only 'Text')</li>
+<li>I can easily rename members with LSP rename action</li>
+<li>I can easily look for anything in the code that uses <code>EnumEnvironment.PRODUCTION</code> with LSP "find references", as opposed to literals, where I have to search for string occurrences.</li>
+</ul>
+<p>The nice thing is that in both cases, mypy and pyright are able to check exhaustiveness of the match statement. They indicate, that the final <code>case _:</code> is unreachable code.<sup class="footnote-reference"><a href="#1">1</a></sup></p>
+<p>And adding a new member - let's say - <code>Test</code> to the variants, and removing the wildcard <code>case _:</code>, also works consistently in both cases. Nevertheless, I have to type out the new literal member on the 'case' again.<sup class="footnote-reference"><a href="#2">2</a></sup></p>
+<blockquote>
+<p>🛑 Cases within match statement do not exhaustively handle all values
+Unhandled type: "Literal[EnumEnvironment.TEST]"
+If exhaustive handling is not intended, add "case _: pass"  (reportMatchNotExhaustive)</p>
+</blockquote>
+<pre class="giallo z-code"><code data-lang="python"><span class="giallo-l"><span class="z-storage z-type">class</span><span class="z-entity z-name"> EnumEnvironment</span><span>(</span><span class="z-entity">StrEnum</span><span>)</span><span>:</span></span>
+<span class="giallo-l"><span class="z-constant">    PRODUCTION</span><span class="z-keyword"> =</span><span> auto</span><span>(</span><span>)</span></span>
+<span class="giallo-l"><span class="z-constant">    STAGING</span><span class="z-keyword"> =</span><span> auto</span><span>(</span><span>)</span></span>
+<span class="giallo-l"><span class="z-constant">    TEST</span><span class="z-keyword"> =</span><span> auto</span><span>(</span><span>)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-storage z-type">def</span><span class="z-entity z-name"> enum_function</span><span>(</span><span class="z-variable z-parameter z-function">this</span><span>:</span><span> EnumEnvironment</span><span>)</span><span>:</span></span>
+<span class="giallo-l"><span class="z-keyword">    match</span><span> this</span><span>:</span></span>
+<span class="giallo-l"><span class="z-keyword">        case</span><span> EnumEnvironment</span><span>.</span><span class="z-constant">PRODUCTION</span><span>:</span></span>
+<span class="giallo-l"><span class="z-support">            print</span><span>(</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-string">a</span><span class="z-punctuation z-definition z-string">&quot;</span><span>)</span></span>
+<span class="giallo-l"><span class="z-keyword">        case</span><span> EnumEnvironment</span><span>.</span><span class="z-constant">STAGING</span><span>:</span></span>
+<span class="giallo-l"><span class="z-support">            print</span><span>(</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-string">b</span><span class="z-punctuation z-definition z-string">&quot;</span><span>)</span></span></code></pre><h2 id="why-not-to-use-enums-then">Why not to use Enums then?<a class="zola-anchor" href="#why-not-to-use-enums-then" aria-label="Anchor link for: why-not-to-use-enums-then" style="visibility: hidden;"></a>
+</h2>
+<p>However, literals are more transportable e.g. using an ORM, it is easier to map Literal to database values, than Enums. If that's your use-case, most likely, you are better off with Literals.</p>
+<p>Another argument can be that if you use native Enums, you will have to perform a database migration every time you make changes. With Literals, you can get away with a varchar columns. In some cases, this can be a lot of overhead - in some teams/workflows this is actually desirable.<sup class="footnote-reference"><a href="#3">3</a></sup></p>
+<h2 id="the-annoying-things">The annoying things<a class="zola-anchor" href="#the-annoying-things" aria-label="Anchor link for: the-annoying-things" style="visibility: hidden;"></a>
+</h2>
+<p>There is something about the import performance of Python Enums<sup class="footnote-reference"><a href="#4">4</a></sup>, however, if you are using python, does it really matter? (It sort of does.)</p>
+<p>There are also a bunch of annoying things about enums, some of which are described in <a rel="nofollow noreferrer external" href="https://www.cosmicpython.com/blog/2020-10-27-i-hate-enums.html">this blog post</a>, but some of those issues are already fixed, or not real issues - as the comments point it out.</p>
+<h2 id="conclusion">Conclusion<a class="zola-anchor" href="#conclusion" aria-label="Anchor link for: conclusion" style="visibility: hidden;"></a>
+</h2>
+<p>I don't really want to draw any general conclusions on when and where to use Enums vs Literals. Hopefully, you have some more pointers on what to consider, before using one or the other.</p>
+<hr />
+<h2 id="references">References<a class="zola-anchor" href="#references" aria-label="Anchor link for: references" style="visibility: hidden;"></a>
+</h2>
+<div class="footnote-definition" id="1"><sup class="footnote-definition-label">1</sup>
+<p><a rel="nofollow noreferrer external" href="https://typing.python.org/en/latest/guides/unreachable.html">https://typing.python.org/en/latest/guides/unreachable.html</a></p>
+</div>
+<div class="footnote-definition" id="2"><sup class="footnote-definition-label">2</sup>
+<p><a rel="nofollow noreferrer external" href="https://typing.python.org/en/latest/spec/enums.html#enum-literal-expansion">https://typing.python.org/en/latest/spec/enums.html#enum-literal-expansion</a></p>
+</div>
+<div class="footnote-definition" id="3"><sup class="footnote-definition-label">3</sup>
+<p><a rel="nofollow noreferrer external" href="https://docs.sqlalchemy.org/en/21/orm/declarative_tables.html#using-python-enum-or-pep-586-literal-types-in-the-type-map">https://docs.sqlalchemy.org/en/21/orm/declarative_tables.html#using-python-enum-or-pep-586-literal-types-in-the-type-map</a></p>
+</div>
+<div class="footnote-definition" id="4"><sup class="footnote-definition-label">4</sup>
+<p><a rel="nofollow noreferrer external" href="https://snarky.ca/introducing-basicenum/">https://snarky.ca/introducing-basicenum/</a></p>
+</div>
+
+      </article>
+
+      
+      
+
+      
+      
+    </div>
+
+    
+
+
+<footer>
+  <div class="left">
+    <div class="copyright">
+      © 2024 tmon
+      
+      <span>|</span>
+      Built with <a href="https://www.getzola.org" rel="noreferrer" target="_blank">zola</a> and <a href="https://github.com/isunjn/serene" rel="noreferrer" target="_blank">serene</a>
+      
+    </div>
+  </div>
+
+  <div class="right">
+    
+    
+      
+    
+    
+    <a id="rss-btn" href="https://tmon.xyz/devlog/rss.xml">RSS</a>
+    
+    
+
+  </div>
+</footer>
+
+
+
+
+<dialog id="rss-mask">
+  <div>
+    <a href="https:&#x2F;&#x2F;tmon.xyz&#x2F;devlog&#x2F;rss.xml">https:&#x2F;&#x2F;tmon.xyz&#x2F;devlog&#x2F;rss.xml</a>
+    
+    
+    <button autofocus aria-label="copy" data-link="https:&#x2F;&#x2F;tmon.xyz&#x2F;devlog&#x2F;rss.xml" data-copy-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;20&quot; height=&quot;20&quot;&gt;&lt;path d=&quot;M6.9998 6V3C6.9998 2.44772 7.44752 2 7.9998 2H19.9998C20.5521 2 20.9998 2.44772 20.9998 3V17C20.9998 17.5523 20.5521 18 19.9998 18H16.9998V20.9991C16.9998 21.5519 16.5499 22 15.993 22H4.00666C3.45059 22 3 21.5554 3 20.9991L3.0026 7.00087C3.0027 6.44811 3.45264 6 4.00942 6H6.9998ZM5.00242 8L5.00019 20H14.9998V8H5.00242ZM8.9998 6H16.9998V16H18.9998V4H8.9998V6Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;" data-check-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;20&quot; height=&quot;20&quot;&gt;&lt;path d=&quot;M10.0007 15.1709L19.1931 5.97852L20.6073 7.39273L10.0007 17.9993L3.63672 11.6354L5.05093 10.2212L10.0007 15.1709Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;" >
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"><path d="M6.9998 6V3C6.9998 2.44772 7.44752 2 7.9998 2H19.9998C20.5521 2 20.9998 2.44772 20.9998 3V17C20.9998 17.5523 20.5521 18 19.9998 18H16.9998V20.9991C16.9998 21.5519 16.5499 22 15.993 22H4.00666C3.45059 22 3 21.5554 3 20.9991L3.0026 7.00087C3.0027 6.44811 3.45264 6 4.00942 6H6.9998ZM5.00242 8L5.00019 20H14.9998V8H5.00242ZM8.9998 6H16.9998V16H18.9998V4H8.9998V6Z" fill="currentColor"></path></svg>
+    </button>
+  </div>
+</dialog>
+
+
+
+  </main>
+</div>
+
+  
+<script src="/js/lightense.min.js"></script>
+
+
+  <script src="https://tmon.xyz/js/main.js"></script>
+  <script src="https://tmon.xyz/js/header.js"></script>
+</body>
+
+</html>
